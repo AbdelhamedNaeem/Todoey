@@ -11,7 +11,7 @@ import CoreData
 
 class CategoryTableViewController: UITableViewController {
     
-    var itemArray = [Category]()
+    var categoties = [Category]()
     
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
@@ -25,7 +25,7 @@ class CategoryTableViewController: UITableViewController {
      //Mark: - TableView Datasource Method
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return itemArray.count
+        return categoties.count
     }
     
     
@@ -33,7 +33,7 @@ class CategoryTableViewController: UITableViewController {
        
         let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
         
-        let item = itemArray[indexPath.row]
+        let item = categoties[indexPath.row]
         
         cell.textLabel?.text = item.name
        
@@ -43,10 +43,15 @@ class CategoryTableViewController: UITableViewController {
     
     //Mark: - TableView Delegate Method
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        saveItems()
+        performSegue(withIdentifier: "goToItems", sender: self)
         
-        tableView.deselectRow(at: indexPath, animated: true)
+    }
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        let destinationVC = segue.destination as! TodoListViewController
         
+        if let indexPath = tableView.indexPathForSelectedRow{
+            destinationVC.selectedCategory = categoties[indexPath.row]
+        }
     }
     //Mark: - Data Manipulation Method
     
@@ -63,7 +68,7 @@ class CategoryTableViewController: UITableViewController {
             
             let newItem = Category(context: self.context)
             newItem.name = textField.text!
-            self.itemArray.append(newItem)
+            self.categoties.append(newItem)
             
             self.saveItems()
         }
@@ -94,7 +99,7 @@ class CategoryTableViewController: UITableViewController {
     
     func loadItems(with request : NSFetchRequest<Category> = Category.fetchRequest()){
         do{
-            itemArray = try context.fetch(request)
+            categoties = try context.fetch(request)
         }catch{
             print("error fetching data from context \(error)")
         }
