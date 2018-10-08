@@ -1,5 +1,5 @@
 //
-//  CategoryTableViewController.swift
+//  CategoryViewController.swift
 //  Todoey
 //
 //  Created by Abdelhamid Naeem on 9/20/18.
@@ -8,10 +8,9 @@
 
 import UIKit
 import RealmSwift
-
+import ChameleonFramework
 
 class CategoryViewController: SwipeTableViewController {
-    
     
     let realm = try! Realm()
     
@@ -24,6 +23,8 @@ class CategoryViewController: SwipeTableViewController {
         loadCategories()
         
         tableView.rowHeight = 80.0
+        
+        tableView.separatorStyle = .none
         
     }
     
@@ -41,8 +42,16 @@ class CategoryViewController: SwipeTableViewController {
        
        let cell = super.tableView(tableView, cellForRowAt: indexPath)
         
-        cell.textLabel!.text = categories?[indexPath.row].name ?? "No Categories Added Yet"
-//        cell.delegate = self as! SwipeTableViewCellDelegate
+        if let category = categories?[indexPath.row]{
+            cell.textLabel!.text = category.name
+            
+            guard let categotyColor = UIColor(hexString: category.color) else {fatalError()}
+            
+            cell.backgroundColor = categotyColor
+            
+            cell.textLabel?.textColor = ContrastColorOf(categotyColor, returnFlat: true)
+            
+        }
         
         return cell
     }
@@ -74,7 +83,7 @@ class CategoryViewController: SwipeTableViewController {
             
             let newCategory = Category()
             newCategory.name = textField.text!
-           
+            newCategory.color = UIColor.randomFlat.hexValue()
 //            self.categories.append(newCategory)
             
             self.save(category: newCategory)
@@ -90,8 +99,6 @@ class CategoryViewController: SwipeTableViewController {
         present(alert, animated: true, completion: nil)
         
     }
-    
-    
     
     func save(category : Category){
         do{
